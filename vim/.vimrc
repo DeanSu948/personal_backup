@@ -1,0 +1,105 @@
+" Vim with all enhancements
+source $VIMRUNTIME/vimrc_example.vim
+
+" Use the internal diff if available.
+" Otherwise use the special 'diffexpr' for Windows.
+
+
+" Self Configuration--------------------------------------------------- {{{
+set number
+syntax on
+set showmode
+set showcmd
+set mouse=a		"can use mouse
+set encoding=utf-8
+set t_Co=256
+filetype indent on
+set autoindent
+set tabstop=2
+set shiftwidth=4
+set expandtab
+set softtabstop=2
+set relativenumber
+set wrap
+set showmatch
+set hlsearch
+set incsearch
+set spell spelllang=en_us
+set autochdir
+set visualbell
+set autoread
+set wildmenu
+set wildmode=longest:list,full
+set guifont=courier_new:h12
+set termguicolors
+set wildmenu
+set wildmode=longest:list,full
+" }}}
+
+
+" VIMSCRIPT -------------------------------------------------------------- {{{
+
+" This will enable code folding.
+" Use the marker method of folding.
+augroup filetype_vim
+    autocmd!
+    autocmd FileType vim setlocal foldmethod=marker
+augroup END
+
+" More Vimscripts code goes here.
+
+" }}}
+
+" Vim Default COnfiguration -----------------------------------{{{
+if &diffopt !~# 'internal'
+  set diffexpr=MyDiff()
+endif
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg1 = substitute(arg1, '!', '\!', 'g')
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg2 = substitute(arg2, '!', '\!', 'g')
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let arg3 = substitute(arg3, '!', '\!', 'g')
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  let cmd = substitute(cmd, '!', '\!', 'g')
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+" }}}
+
+" MAPPINGS --------------------------------------------------------------- {{{
+
+" Mappings code goes here.
+
+" map jj to <esc>
+inoremap jj <esc>
+
+" map \ as leader key (initial: ,)
+let mapleader = "\"
+
+" Press \\ to jump back to the last cursor position.
+nnoremap <leader>\ ``
+
+" }}}
+
+endfunction
